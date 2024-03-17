@@ -3,6 +3,16 @@
 // override default memory limit, since log file too big
 ini_set('memory_limit', '-1');
 
+// print Logo
+print_r("  _    _ _______ __  __                        _                     
+ | |  | |__   __|  \/  |     /\               | |                    
+ | |  | |  | |  | \  / |    /  \   _ __   __ _| |_   _ ___  ___ _ __ 
+ | |  | |  | |  | |\/| |   / /\ \ | '_ \ / _` | | | | / __|/ _ \ '__|
+ | |__| |  | |  | |  | |  / ____ \| | | | (_| | | |_| \__ \  __/ |   
+  \____/   |_|  |_|  |_| /_/    \_\_| |_|\__,_|_|\__, |___/\___|_|   
+                                                  __/ |              
+                                                 |___/               ");
+
 // read contents from file
 $logData = file_get_contents('../updatev12-access-pseudonymized_short.log');
 
@@ -32,6 +42,19 @@ for ($i = 0; $i < $arrayIndexSize; $i++) {
     }
 }
 
-print_r($finishedArray);
+// filter the key-value array for serial numbers
+$serialNumbers = array_column($finishedArray, 'SerialNumber');
+// count found serial numbers
+$countSerialNumbers = array_count_values($serialNumbers);
+// sort ascending with keeping key-value pairs
+$sortHighestTen = arsort($countSerialNumbers, SORT_NUMERIC );
+
+// First task answer
+print_r('
+What are the 10 license serial numbers that try to access the server the most? How many
+times are they trying to access the server?
+');
+// cut at 10th entry
+print_r(array_slice($countSerialNumbers, 0, 10, true));
 
 ?>
