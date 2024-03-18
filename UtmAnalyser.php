@@ -1,4 +1,6 @@
 <?php
+// import checking library for analysis of logfile data consistency
+require('CheckDataConsistency.php');
 
 // override default memory limit, since log file too big
 ini_set('memory_limit', '-1');
@@ -33,15 +35,26 @@ $keys = array("PublicIP", "UpdServName", "AccessTime", "HTTP Method", "APIUrl",
 
 // for loop to loop through the data to get key-value pairs, to be able to later on filter data
 for ($i = 0; $i < $arrayIndexSize; $i++) {
+
     $temporaryArray[] = $logDataIntoArray[$i];
+
+    print_r($temporaryArray);
+    // create CheckDataConsistency object
+    $checkCurrentIp = new CheckDataConsistency();
+    // use method checkIp on index 0 (is IP)
+    // if returns false - clear array, since first index isn't an IP
+    if (!$checkCurrentIp->checkIp($temporaryArray[0])) {
+        $temporaryArray = array_diff($temporaryArray, $temporaryArray);
+    }
 
     if (count($temporaryArray) == 15) {
         $associativeArray = array_combine($keys, $temporaryArray);
         $finishedArray[] = $associativeArray;
-        $temporaryArray = array();
+        $temporaryArray = array_diff($temporaryArray, $temporaryArray);
     }
 }
 
+// First task
 // filter the key-value array for serial numbers
 $serialNumbers = array_column($finishedArray, 'SerialNumber');
 // count found serial numbers
